@@ -227,6 +227,11 @@ function socket.shutdown(id)
 	close_fd(id, driver.shutdown)
 end
 
+function socket.close_fd(id)
+	assert(socket_pool[id] == nil,"Use socket.close instead")
+	driver.close(id)
+end
+
 function socket.close(id)
 	local s = socket_pool[id]
 	if s == nil then
@@ -248,7 +253,7 @@ function socket.close(id)
 		s.connected = false
 	end
 	close_fd(id)	-- clear the buffer (already close fd)
-	assert(s.lock_set == nil or next(s.lock_set) == nil)
+	assert(s.lock == nil or next(s.lock) == nil)
 	socket_pool[id] = nil
 end
 
@@ -401,8 +406,6 @@ function socket.limit(id, limit)
 end
 
 ---------------------- UDP
-
-local udp_socket = {}
 
 local function create_udp_object(id, cb)
 	assert(not socket_pool[id], "socket is not closed")
