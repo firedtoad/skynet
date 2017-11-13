@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-local socket = require "socket"
+local socket = require "skynet.socket"
 require "skynet.manager"	-- import skynet.launch, ...
 local table = table
 
@@ -260,8 +260,11 @@ skynet.start(function()
 			end
 		end)
 		skynet.wait()
+		socket.close(slave_fd)
+	else
+		-- slave_fd does not start, so use close_fd.
+		socket.close_fd(slave_fd)
 	end
-	socket.close(slave_fd)
 	skynet.error("Shakehand ready")
 	skynet.fork(ready)
 end)
